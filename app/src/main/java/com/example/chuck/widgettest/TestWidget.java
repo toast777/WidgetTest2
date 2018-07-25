@@ -6,6 +6,8 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.widget.RemoteViews;
 
 import java.util.ArrayList;
@@ -34,11 +36,18 @@ public class TestWidget extends AppWidgetProvider {
         int[] realAppWidgetIds = AppWidgetManager.getInstance(context)
                 .getAppWidgetIds(new ComponentName(context, TestWidget.class));
         for (int id : realAppWidgetIds) {
+            SharedPreferences sharedPreferences = context.getSharedPreferences("WidgetList",Context.MODE_PRIVATE);
+            String list1 = sharedPreferences.getString("Name1", "Harneet");
+            String list2 = sharedPreferences.getString("Name2", "Harneet");
+
+
             if (wList == null) {
                 wList = new ArrayList<>();
-                wList.add("Treehouse");
-                wList.add("Android");
+                wList.add(list1);
+                wList.add(list2);
             }
+
+
             RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.test_widget);
             Intent serviceIntent = new Intent(context, WidgetService.class);
             remoteViews.setRemoteAdapter(R.id.listView, serviceIntent);

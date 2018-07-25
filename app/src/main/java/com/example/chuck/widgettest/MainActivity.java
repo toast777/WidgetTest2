@@ -5,6 +5,8 @@ import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,6 +18,8 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
+    SharedPreferences.Editor editor;
+    SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,31 +28,34 @@ public class MainActivity extends AppCompatActivity {
 
         Button bWidget = findViewById(R.id.widget_button);
 
+        sharedPreferences = getSharedPreferences("WidgetList",Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+        editor.putString("Name1","Treehouse");
+        editor.putString("Name2","Georgia");
+        editor.apply();
+
+
         bWidget.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Context context = v.getContext();
                 AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-                RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.test_widget);
-                ComponentName thisWidget = new ComponentName(context, TestWidget.class);
-               // remoteViews.setTextViewText(R.id.my_text_view, "myText" + System.currentTimeMillis());
-                ArrayList<String> wList = new ArrayList<>();
-                wList.add("Treehouse");
-                wList.add("Georgia");
-                Intent serviceIntent = new Intent(context, WidgetService.class);
-                remoteViews.setRemoteAdapter(R.id.listView, serviceIntent);
-                Intent intent = new Intent(context, TestWidget.class);
 
-                serviceIntent.putStringArrayListExtra("Test String", wList);
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(
-                        context,
-                        0,
-                        intent,
-                        PendingIntent.FLAG_UPDATE_CURRENT
-                );
-                remoteViews.setPendingIntentTemplate(R.id.listView, pendingIntent);
-                appWidgetManager.updateAppWidget(thisWidget, remoteViews);
+                editor.putString("Name1","Two");
+                editor.putString("Name2","Three");
+                editor.apply();
+
+//
+//                int widgetIDs[] = AppWidgetManager.getInstance(getApplication()).getAppWidgetIds(new ComponentName(getApplication(), TestWidget.class));
+//
+//                for (int id : widgetIDs)
+//                    AppWidgetManager.getInstance(getApplication()).notifyAppWidgetViewDataChanged(id, R.id.frameLayout);
+//
+                ComponentName thisWidget = new ComponentName(context, TestWidget.class);
+                int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget);
+                appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.frameLayout);
             }
+
         });
     }
 }

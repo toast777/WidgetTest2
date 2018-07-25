@@ -2,19 +2,28 @@ package com.example.chuck.widgettest;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import org.w3c.dom.Text;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
+import static android.content.ContentValues.TAG;
+
 public class WidgetAdapter implements RemoteViewsService.RemoteViewsFactory {
-    Context context;
+    private Context context;
     private ArrayList<String> list;
 
-    public WidgetAdapter(Context context, ArrayList<String> list) {
-        this.list = list;
+    public WidgetAdapter(Context context) {
+        this.list = getIngredients();
         this.context = context;
     }
 
@@ -25,7 +34,21 @@ public class WidgetAdapter implements RemoteViewsService.RemoteViewsFactory {
 
     @Override
     public void onDataSetChanged() {
+        list = getIngredients();
+    }
 
+    private ArrayList<String> getIngredients(){
+
+        ArrayList<String> arrayList = null;
+        if (context != null) {
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+            String listJson = sharedPreferences.getString("json1", "No Data");
+            Gson gson = new Gson();
+            Type type = new TypeToken<ArrayList<String>>() {
+            }.getType();
+            arrayList = gson.fromJson(listJson, type);
+        }
+        return arrayList;
     }
 
     @Override
@@ -44,9 +67,7 @@ public class WidgetAdapter implements RemoteViewsService.RemoteViewsFactory {
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.list_item);
         remoteViews.setTextViewText(R.id.textView, list.get(position));
 
-        Intent intent = new Intent();
-        intent.putExtra(TestWidget.KEY_ITEM, list.get(position));
-        remoteViews.setOnClickFillInIntent(R.id.list_item, intent);
+        Log.i(TAG, list.get(position));
 
         return remoteViews;    }
 

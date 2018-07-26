@@ -23,8 +23,8 @@ public class WidgetAdapter implements RemoteViewsService.RemoteViewsFactory {
     private ArrayList<String> list;
 
     public WidgetAdapter(Context context) {
-        this.list = getIngredients();
         this.context = context;
+        this.list = getIngredients();
     }
 
     @Override
@@ -40,14 +40,14 @@ public class WidgetAdapter implements RemoteViewsService.RemoteViewsFactory {
     private ArrayList<String> getIngredients(){
 
         ArrayList<String> arrayList = null;
-        if (context != null) {
+//        if (context != null) {
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
             String listJson = sharedPreferences.getString("json1", "No Data");
             Gson gson = new Gson();
             Type type = new TypeToken<ArrayList<String>>() {
             }.getType();
             arrayList = gson.fromJson(listJson, type);
-        }
+//        }
         return arrayList;
     }
 
